@@ -1,5 +1,4 @@
 .env
-/sprint-artifacts/*
 services/auth-service/node_modules
 .vscode/
 services/auth-service/coverage/*

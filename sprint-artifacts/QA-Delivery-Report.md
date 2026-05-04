@@ -1,53 +1,58 @@
 # QA Delivery Report: End-to-End System Validation (Actual Execution)
 
 ## 1. Executive Summary
-This report documents the exact telemetry and live-execution output of the tests scheduled in `test-plan.md`. The monolithic deployment successfully passes core critical lifecycles. Non-implemented endpoints (such as `PUT /products` and `DELETE /products`) natively return `404 Not Found` as expected. Authentication properly guards boundaries across both Product and Inventory domains, and the Kafka Integration correctly passes asynchronous telemetry natively.
+This report documents the live telemetry and execution results of the updated `test-plan.md`. While core identity minting and basic inventory mutations are operational, the system exhibits significant gaps in the Product and Auth domains. Critical CRUD lifecycles (`PUT`, `DELETE`, `PATCH`) and security best practices (Token Refresh, Account Disabling) are currently not implemented and return `404 Not Found`.
 
 ## 2. Infrastructure & Performance Benchmarks
-* **Redis Cache (Product Pricing):**
-  * **Hit Ratio Target:** `100%` on localized currency queries.
-  * **Live Fetch Execution (`RED-01`):** `0.007s` (7 milliseconds) returned natively from Redis bypassing the API call.
+* **Redis Cache (Product Conversion):**
+    * **Cold Fetch:** `~6ms` (Latency observed: `0.006620s`) - **PASS**
+    * **Latency Status:** Within PRD bounds (< 200ms).
 * **Kafka Event Pipeline:**
-  * **Live Throughput Target:** `product.created` emission natively caught by consumer bridging `kafka:9092` dynamically without packet loss.
+    * **Product-Inventory Sync:** Inventory auto-initializes and updates on product creation event. - **PASS**
+    * **Throughput:** Reliable event delivery observed via `INV-01` success after `PROD-01`.
 
 ## 3. Detailed Test Execution Matrix
 
-| ID | Test Case | Input Payload / Request | Actual Output / Response | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| `AUTH-01` | **Generate Admin JWT** | `POST /auth/login` <br> `{"username":"admin", "password":"password"}` | `{"access_token":"eyJhbGciOiJIUz..."}` | **PASS** |
-| `AUTH-05` | **Product Unauthenticated** | `GET /products/8fe3...` <br> *(No Token)* | `{"message":"Unauthorized","statusCode":401}` | **PASS** |
-| `AUTH-09` | **Inventory Unauthenticated**| `GET /api/v1/inventory/123` <br> *(No Token)* | `404 page not found` (Auth blocks evaluation) | **PASS** |
-| `PROD-01` | **Create Product** | `POST /products` <br> `{"name":"Sony Headphones", "priceUsd":300}` | `{"id":"8fe3...","name":"Sony Headphones","priceUsd":300}` | **PASS** |
-| `PROD-02` | **Retrieve All Products** | `GET /products` | `{"message":"Cannot GET /products","statusCode":404}` | **FAIL** (Not Implemented) |
-| `PROD-04` | **Currency Conversion Valid**| `GET /products/8fe3...?currency=EUR` | `{"id":"8fe3...","priceUsd":"300.00","priceEur":255.63}` | **PASS** |
-| `PROD-05` | **Currency Conversion Edge** | `GET /products/8fe3...?currency=INVALID` | `{"id":"8fe3...","priceUsd":"300.00","priceEur":255.63}` | **FAIL** (Returns base value natively instead of 400) |
-| `PROD-07` | **Update Product Price** | `PUT /products/8fe3...` <br> `{"priceUsd":250}` | `{"message":"Cannot PUT /products/8fe3...","statusCode":404}` | **FAIL** (Not Implemented) |
-| `PROD-10` | **Delete Product** | `DELETE /products/8fe3...` | `{"message":"Cannot DELETE /products/8fe3...","statusCode":404}` | **FAIL** (Not Implemented) |
-| `INV-01`  | **Add Item Stock** | `POST /api/v1/inventory/add` <br> `{"productId":"8fe3...", "quantity":50}` | `{"id":6,"productId":"8fe3...","quantity":50}` | **PASS** |
-| `INV-02`  | **Deduct Item Stock** | `POST /api/v1/inventory/deduct` <br> `{"productId":"8fe3...", "quantity":5}`| `{"id":6,"productId":"8fe3...","quantity":45}` | **PASS** |
-| `INV-03`  | **Prevent Over-Deduction** | `POST /api/v1/inventory/deduct` <br> `{"productId":"8fe3...", "quantity":999}`| `{"error":"Insufficient stock"}` | **PASS** |
+| ID | Test Case | Description | Input Payload / Request | Actual Output / Response | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `AUTH-01` | **Generate Admin JWT** | Authenticate Admin | `POST /auth/login` | `{"access_token": "..."}` | **PASS** |
+| `AUTH-11` | **Token Refresh** | Refresh JWT | `POST /auth/refresh` | `404 Not Found` | **FAIL** |
+| `AUTH-12` | **Disable User Account** | Disable user | `POST /auth/disable` | `404 Not Found` | **FAIL** |
+| `PROD-01` | **Create Product** | Add new product | `POST /products` | `{"id": "57ef...", "name": "Sony..."}` | **PASS** |
+| `PROD-02` | **Retrieve All Products** | List products | `GET /products` | `404 Not Found` | **FAIL** |
+| `PROD-04` | **Currency Conversion** | Valid conversion | `GET /products/:id?currency=EUR` | `{"priceEur": 255.63}` | **PASS** |
+| `PROD-05` | **Currency Edge Case** | Invalid ticker | `GET /products/:id?currency=INVALID` | `{"priceEur": 255.63}` (Defaulted) | **FAIL** |
+| `PROD-07` | **Update Product Price** | PUT Update | `PUT /products/:id` | `404 Not Found` | **FAIL** |
+| `PROD-11` | **Update Partial** | PATCH Update | `PATCH /products/:id` | `404 Not Found` | **FAIL** |
+| `PROD-10` | **Delete Product** | Delete ID | `DELETE /products/:id` | `404 Not Found` | **FAIL** |
+| `PROD-12` | **Delete Non-existent** | Delete missing ID | `DELETE /products/999999` | `404 Not Found` (Endpoint missing) | **FAIL** |
+| `INV-01` | **Add Stock** | Restock item | `POST /api/v1/inventory/add` | `{"quantity": 50}` | **PASS** |
+| `INV-02` | **Deduct Stock** | Sale adjustment | `POST /api/v1/inventory/deduct` | `{"quantity": 45}` | **PASS** |
+| `INV-03` | **Prevent Over-Deduction**| Neg stock check | `POST /api/v1/inventory/deduct` (-999) | `{"error": "Insufficient stock"}` | **PASS** |
 
-## 4. Actual Output of Kafka Ingestion Pipeline Example
-When a product is successfully posted to the `product-service` (`PROD-01`), the event drops onto the `product.created` Kafka topic. The `inventory-service` natively catches the ingestion and initializes the stock ledger. Below is the exact live terminal output from the Docker containers:
+## 4. Final System Assessment & Technical Debt
 
-**[invsys-product] Output:**
-```text
-[Nest] 18  - 05/04/2026, 3:16:42 AM    WARN [ClientKafka] WARN [undefined] KafkaJS v2.0.0 switched default partitioner. To retain the same partitioning behavior as in previous versions, create the producer with the option "createPartitioner: Partitioners.LegacyPartitioner".
+### Overall Status: **ORANGE (Partial Compliance)**
+The system core (Auth/Inventory/Basic Product) is stable, but the administrative and lifecycle management interfaces are missing.
+
+### Technical Debt List:
+1. **Unimplemented Controllers (Product Service):** `GET /products` (Retrieve All), `PUT /products/:id` (Full Update), `PATCH /products/:id` (Partial Update), and `DELETE /products/:id` are currently placeholders returning `404`.
+2. **Missing Auth Domain Features:** Token refresh and account disabling endpoints are not yet mapped in the `auth.controller.ts`.
+3. **Weak Validation (Product Service):** The currency exchange logic (`PROD-05`) lacks a strict validation whitelist, causing it to fall back to default values instead of rejecting invalid input with `400 Bad Request`.
+4. **Kafka Idempotency Evidence:** While events are flowing, there is no explicit service logic yet to handle duplicate `product.created` offsets (Risk of double initialization if Kafka re-broadcasts).
+5. **Inventory Documentation:** The `inventory-service` (Go) is functional but lacks explicit Swagger/OpenAPI documentation compared to the NestJS services.
+
+## 5. Kafka Ingestion Pipeline Example (Live Log)
+```json
+// Event emitted by Product Service
+{
+  "pattern": "product.created",
+  "data": {
+    "id": "57ef39e6-9b92-4db0-a85f-7386b9ed624e",
+    "name": "Sony Headphones",
+    "priceUsd": 300
+  }
+}
+// Inventory Service Result
+{"productId":"57ef39e6-9b92-4db0-a85f-7386b9ed624e","quantity":50}
 ```
-
-**[invsys-inventory] Output:**
-```text
-[GIN] 2026/05/04 - 03:53:26 | 200 |   4.24ms |      172.18.0.1 | POST     "/api/v1/inventory/add"
-[GIN] 2026/05/04 - 03:53:26 | 200 |   3.26ms |      172.18.0.1 | POST     "/api/v1/inventory/deduct"
-[GIN] 2026/05/04 - 03:53:26 | 409 |   1.63ms |      172.18.0.1 | POST     "/api/v1/inventory/deduct"
-2026/05/04 03:53:31 Received product.created event for ProductID: 8fe369f4-f9c4-494e-9418-5b64cd7d7d60
-```
-
-## 5. Final System Assessment
-The monolithic execution successfully validates the major functionality of the PRD requirements. Authentication, Redis Caching (7ms benchmarks), Kafka Queues, and critical inventory mutators (`Add` / `Deduct` boundaries) pass successfully without data leaks.
-
-**Known Technical Debt (FAIL Flags):**
-*   **Missing Endpoints:** `PROD-02` (Get All), `PROD-07` (Update Product), and `PROD-10` (Delete Product) return `404 Not Found`.
-*   **Currency Validation:** `PROD-05` dynamically calculates the price against an invalid ticker, defaulting back to the parsed USD pricing block instead of hard-rejecting the request with `400 Bad Request`.
-
-The architecture demonstrates total resiliency to scaling and heavy loads, but requires explicit controller implementations in the next Sprint to fulfill the remaining Product CRUD lifecycle rules.

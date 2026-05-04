@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
+import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
 describe('Auth Service End-to-End (e2e)', () => {
-  let app: INestApplication;
+  let app: INestApplication<App>;
   let userToken: string;
 
   beforeAll(async () => {
@@ -45,7 +46,7 @@ describe('Auth Service End-to-End (e2e)', () => {
     it('AUTH-EXT-01: Should successfully create a new user (Registration)', () => {
       return request(app.getHttpServer())
         .post('/auth/register')
-        .send({ username: 'newuser', password: 'securepassword123', role: 'user' })
+        .send({ username: 'newuser', email: 'newuser@example.com', password: 'securepassword123' })
         .expect(201); // Expecting feature to be built
     });
 

@@ -34,6 +34,9 @@ This Test Plan defines the formal validation requirements for the Microservice E
 | `AUTH-08` | **Inventory Admin Mutation** | `POST /api/v1/inventory/deduct` (Admin)| `200 OK` | Admins can safely adjust inventory thresholds. |
 | `AUTH-09` | **Inventory Unauthenticated**| `GET /api/v1/inventory/:id` (No JWT)| `401 Unauthorized` | Invalid/expired tokens gracefully reject on Inventory bounds. |
 | `AUTH-10` | **Inventory User Read** | `GET /api/v1/inventory/:id` (User JWT)| `200 OK` | Standard users can successfully retrieve stock counts. |
+| `AUTH-11` | **Token Refresh** | `POST /auth/refresh` | `201 Created` + New JWT | Rejects expired/invalid refresh tokens. |
+| `AUTH-12` | **Disable User Account** | `POST /auth/disable` (Admin) | `200 OK` | Disabled users are rejected on next login attempt. |
+
 
 ---
 
@@ -51,7 +54,10 @@ This Test Plan defines the formal validation requirements for the Microservice E
 | `PROD-07` | **Update Product Price** | `PUT /products/:id` (Changing price) | `200 OK` + Updated Price | Automatically populates new entry into Price History ledger. |
 | `PROD-08` | **Price History Tracking** | `GET /products/:id/history` | Array of historic price mutations. | Empty history returns `[]` cleanly. |
 | `PROD-09` | **Price History Date Filtering**| `GET /products/:id/history?from=YYYY-MM-DD`| Filtered history array. | Ensures time-series data is queryable natively. |
-| `PROD-10` | **Delete Product** | `DELETE /products/:id` | `200 OK` (Soft or Hard delete) | Queries to deleted ID return `404 Not Found`. |
+| `PROD-10` | **Delete Product** | `DELETE /products/:id` (Admin) | `200 OK` | Queries to deleted ID return `404 Not Found`. |
+| `PROD-11` | **Update Partial Product** | `PATCH /products/:id` (Admin) | `200 OK` + Updated fields | Validates that only provided fields are changed. |
+| `PROD-12` | **Delete Non-existent** | `DELETE /products/INVALID_ID` | `404 Not Found` | Gracefully handles non-existent deletions. |
+
 
 ---
 

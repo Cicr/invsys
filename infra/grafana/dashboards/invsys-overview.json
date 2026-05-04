@@ -1,0 +1,71 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "CPU Usage (NodeJS - Auth & Product)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "rate(process_cpu_user_seconds_total{job=~\"auth-service|product-service\"}[1m])", "legendFormat": "{{job}} User CPU" },
+        { "expr": "rate(process_cpu_system_seconds_total{job=~\"auth-service|product-service\"}[1m])", "legendFormat": "{{job}} Sys CPU" }
+      ]
+    },
+    {
+      "title": "Memory Usage (NodeJS - Auth & Product)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "nodejs_external_memory_bytes{job=~\"auth-service|product-service\"}", "legendFormat": "{{job}} External Mem" },
+        { "expr": "nodejs_heap_space_size_used_bytes{job=~\"auth-service|product-service\"}", "legendFormat": "{{job}} Heap Used" }
+      ]
+    },
+    {
+      "title": "Golang GoRoutines (Inventory)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "go_goroutines{job=\"inventory-service\"}", "legendFormat": "GoRoutines" }
+      ]
+    },
+    {
+      "title": "Golang Heap Allocated (Inventory)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "go_memstats_alloc_bytes{job=\"inventory-service\"}", "legendFormat": "Allocated Heap" }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "style": "dark",
+  "tags": ["invsys", "telemetry"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Invsys Overview",
+  "uid": "invsys-overview-1",
+  "version": 1
+}

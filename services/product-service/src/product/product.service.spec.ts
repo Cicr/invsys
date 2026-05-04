@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from './product.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product } from './product.entity';
+import { PriceHistory } from './price-history.entity';
 import { ExchangeService } from '../exchange/exchange.service';
 
 describe('ProductService', () => {
@@ -11,10 +12,18 @@ describe('ProductService', () => {
     create: jest.fn().mockImplementation((dto) => dto),
     save: jest.fn().mockImplementation((product) => Promise.resolve({ id: 'uuid-1', ...product })),
     findOne: jest.fn(),
+    find: jest.fn().mockResolvedValue([]),
+    remove: jest.fn().mockResolvedValue({}),
+  };
+
+  const mockHistoryRepo = {
+    create: jest.fn().mockImplementation((dto) => dto),
+    save: jest.fn().mockResolvedValue({}),
+    find: jest.fn().mockResolvedValue([]),
   };
 
   const mockKafkaClient = {
-    emit: jest.fn(),
+    emit: jest.fn().mockReturnValue({ subscribe: jest.fn() }),
   };
 
   const mockExchangeService = {
@@ -26,6 +35,7 @@ describe('ProductService', () => {
       providers: [
         ProductService,
         { provide: getRepositoryToken(Product), useValue: mockRepo },
+        { provide: getRepositoryToken(PriceHistory), useValue: mockHistoryRepo },
         { provide: 'KAFKA_SERVICE', useValue: mockKafkaClient },
         { provide: ExchangeService, useValue: mockExchangeService },
       ],
@@ -36,6 +46,7 @@ describe('ProductService', () => {
   });
 
   it('should create a product and emit an event', async () => {
+    mockKafkaClient.emit.mockReturnValue({ subscribe: jest.fn() });
     const res = await service.create({ name: 'Test', priceUsd: 100 });
     expect(res.id).toBe('uuid-1');
     expect(mockKafkaClient.emit).toHaveBeenCalledWith('product.created', { productId: 'uuid-1', action: 'product.created' });
@@ -47,9 +58,23 @@ describe('ProductService', () => {
     expect(res).toBeNull();
   });
 
-  it('should return a product with EUR price', async () => {
+  it('should return a product with EUR price when currency is provided', async () => {
+    mockExchangeService.getRates.mockResolvedValueOnce({ EUR: 0.9 });
+    mockRepo.findOne.mockResolvedValueOnce({ id: 'uuid-1', name: 'Test', priceUsd: 100 });
+    const res = await service.get('uuid-1', 'EUR') as any;
+    expect(res.priceEUR).toBe(90);
+  });
+
+  it('should return plain product without currency param', async () => {
     mockRepo.findOne.mockResolvedValueOnce({ id: 'uuid-1', name: 'Test', priceUsd: 100 });
     const res = await service.get('uuid-1');
-    expect(res.priceEur).toBe(90);
+    expect(res).toBeDefined();
+    expect((res as any).id).toBe('uuid-1');
+  });
+
+  it('should return null when removing a non-existent product', async () => {
+    mockRepo.findOne.mockResolvedValueOnce(null);
+    const res = await service.remove('non-existent');
+    expect(res).toBeNull();
   });
 });

@@ -5,13 +5,26 @@ export declare class ProductController {
     create(data: {
         name: string;
         priceUsd: number;
+        category?: string;
+        sku?: string;
+        description?: string;
     }): Promise<import("./product.entity").Product>;
-    get(id: string): Promise<{
-        priceEur: number;
-        id: string;
+    findAll(category?: string): Promise<import("./product.entity").Product[]>;
+    getHistory(id: string): Promise<import("./price-history.entity").PriceHistory[]>;
+    get(id: string, currency?: string): Promise<import("./product.entity").Product>;
+    update(id: string, data: Partial<{
         name: string;
         priceUsd: number;
-        createdAt: Date;
-        updatedAt: Date;
-    } | null>;
+        category: string;
+        description: string;
+    }>): Promise<import("./product.entity").Product>;
+    patch(id: string, data: Partial<{
+        name: string;
+        priceUsd: number;
+        category: string;
+        description: string;
+    }>): Promise<import("./product.entity").Product>;
+    remove(id: string): Promise<{
+        message: string;
+    }>;
 }

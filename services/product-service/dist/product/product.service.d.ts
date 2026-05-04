@@ -1,22 +1,30 @@
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
+import { PriceHistory } from './price-history.entity';
 import { ClientKafka } from '@nestjs/microservices';
 import { ExchangeService } from '../exchange/exchange.service';
 export declare class ProductService {
     private readonly productRepo;
+    private readonly historyRepo;
     private readonly kafkaClient;
     private readonly exchangeService;
-    constructor(productRepo: Repository<Product>, kafkaClient: ClientKafka, exchangeService: ExchangeService);
+    private readonly logger;
+    constructor(productRepo: Repository<Product>, historyRepo: Repository<PriceHistory>, kafkaClient: ClientKafka, exchangeService: ExchangeService);
     create(data: {
         name: string;
         priceUsd: number;
+        category?: string;
+        sku?: string;
+        description?: string;
     }): Promise<Product>;
-    get(id: string): Promise<{
-        priceEur: number;
-        id: string;
+    findAll(category?: string): Promise<Product[]>;
+    get(id: string, currency?: string): Promise<Product | null>;
+    update(id: string, data: Partial<{
         name: string;
         priceUsd: number;
-        createdAt: Date;
-        updatedAt: Date;
-    } | null>;
+        category: string;
+        description: string;
+    }>): Promise<Product | null>;
+    remove(id: string): Promise<true | null>;
+    getPriceHistory(productId: string): Promise<PriceHistory[]>;
 }

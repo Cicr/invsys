@@ -14,6 +14,8 @@ const app_service_1 = require("./app.service");
 const product_module_1 = require("./product/product.module");
 const exchange_module_1 = require("./exchange/exchange.module");
 const product_entity_1 = require("./product/product.entity");
+const price_history_entity_1 = require("./product/price-history.entity");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,11 +29,12 @@ exports.AppModule = AppModule = __decorate([
                 username: process.env.PRODUCTS_DB_USER || 'postgres',
                 password: process.env.PRODUCTS_DB_PASSWORD || 'local_secret_password',
                 database: process.env.PRODUCTS_DB_NAME || 'products_db',
-                entities: [product_entity_1.Product],
+                entities: [product_entity_1.Product, price_history_entity_1.PriceHistory],
                 synchronize: true,
             }),
             product_module_1.ProductModule,
             exchange_module_1.ExchangeModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

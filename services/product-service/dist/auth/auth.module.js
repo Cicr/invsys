@@ -8,12 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const auth_service_1 = require("./auth.service");
 const passport_1 = require("@nestjs/passport");
 const jwt_1 = require("@nestjs/jwt");
-const config_1 = require("@nestjs/config");
 const jwt_strategy_1 = require("./jwt.strategy");
-const auth_controller_1 = require("./auth.controller");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -21,26 +18,12 @@ exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             passport_1.PassportModule,
-            jwt_1.JwtModule.registerAsync({
-                imports: [config_1.ConfigModule],
-                useFactory: async (configService) => {
-                    const secret = configService.get('JWT_SECRET');
-                    if (!secret) {
-                        throw new Error('FATAL: JWT_SECRET is missing during AuthModule initialization.');
-                    }
-                    return {
-                        secret: secret,
-                        signOptions: {
-                            expiresIn: configService.get('JWT_EXPIRES_IN') || '1h'
-                        },
-                    };
-                },
-                inject: [config_1.ConfigService],
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET || 'fallback_secret',
             }),
         ],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
-        exports: [auth_service_1.AuthService],
-        controllers: [auth_controller_1.AuthController],
+        providers: [jwt_strategy_1.JwtStrategy],
+        exports: [passport_1.PassportModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

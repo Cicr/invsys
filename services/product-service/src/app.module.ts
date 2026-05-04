@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ProductModule } from './product/product.module';
 import { ExchangeModule } from './exchange/exchange.module';
 import { Product } from './product/product.entity';
+import { PriceHistory } from './product/price-history.entity';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -16,7 +17,7 @@ import { AuthModule } from './auth/auth.module';
       username: process.env.PRODUCTS_DB_USER || 'postgres',
       password: process.env.PRODUCTS_DB_PASSWORD || 'local_secret_password',
       database: process.env.PRODUCTS_DB_NAME || 'products_db',
-      entities: [Product],
+      entities: [Product, PriceHistory],
       synchronize: true, // Only for dev
     }),
     ProductModule,

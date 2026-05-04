@@ -12,22 +12,49 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const disabledUsers = new Set();
+const registeredUsers = [];
 let AuthService = class AuthService {
     jwtService;
     constructor(jwtService) {
         this.jwtService = jwtService;
     }
     async validateUser(username, pass) {
+        if (disabledUsers.has(username)) {
+            return null;
+        }
         if (username === 'admin' && pass === 'password') {
-            return { userId: 1, username: 'admin' };
+            return { userId: 1, username: 'admin', role: 'admin' };
+        }
+        const found = registeredUsers.find(u => u.username === username && u.password === pass);
+        if (found) {
+            return { userId: found.username, username: found.username, role: 'user' };
         }
         return null;
     }
+    isUserDisabled(username) {
+        return disabledUsers.has(username);
+    }
     async login(user) {
-        const payload = { username: user.username, sub: user.userId };
+        const payload = { username: user.username, sub: user.userId, role: user.role };
         return {
             access_token: this.jwtService.sign(payload),
         };
+    }
+    async register(username, email, password) {
+        registeredUsers.push({ username, email, password });
+        return { status: 'created', user: { username, email } };
+    }
+    async refresh(token) {
+        const payload = this.jwtService.verify(token);
+        const newPayload = { username: payload.username, sub: payload.sub, role: payload.role };
+        return {
+            access_token: this.jwtService.sign(newPayload),
+        };
+    }
+    async disableUser(username) {
+        disabledUsers.add(username);
+        return { status: 'disabled', username };
     }
 };
 exports.AuthService = AuthService;

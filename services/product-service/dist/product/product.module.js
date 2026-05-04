@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const product_controller_1 = require("./product.controller");
 const product_service_1 = require("./product.service");
 const product_entity_1 = require("./product.entity");
+const price_history_entity_1 = require("./price-history.entity");
 const microservices_1 = require("@nestjs/microservices");
 const exchange_module_1 = require("../exchange/exchange.module");
 let ProductModule = class ProductModule {
@@ -20,7 +21,7 @@ exports.ProductModule = ProductModule;
 exports.ProductModule = ProductModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forFeature([product_entity_1.Product]),
+            typeorm_1.TypeOrmModule.forFeature([product_entity_1.Product, price_history_entity_1.PriceHistory]),
             exchange_module_1.ExchangeModule,
             microservices_1.ClientsModule.register([
                 {

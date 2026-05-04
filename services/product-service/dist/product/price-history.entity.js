@@ -9,52 +9,37 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Product = void 0;
+exports.PriceHistory = void 0;
 const typeorm_1 = require("typeorm");
-let Product = class Product {
+let PriceHistory = class PriceHistory {
     id;
-    name;
-    priceUsd;
-    category;
-    description;
-    sku;
-    createdAt;
-    updatedAt;
+    productId;
+    oldPriceUsd;
+    newPriceUsd;
+    changedAt;
 };
-exports.Product = Product;
+exports.PriceHistory = PriceHistory;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
-    __metadata("design:type", String)
-], Product.prototype, "id", void 0);
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], PriceHistory.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Product.prototype, "name", void 0);
+], PriceHistory.prototype, "productId", void 0);
 __decorate([
     (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2 }),
     __metadata("design:type", Number)
-], Product.prototype, "priceUsd", void 0);
+], PriceHistory.prototype, "oldPriceUsd", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], Product.prototype, "category", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], Product.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true, unique: true }),
-    __metadata("design:type", String)
-], Product.prototype, "sku", void 0);
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2 }),
+    __metadata("design:type", Number)
+], PriceHistory.prototype, "newPriceUsd", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
-], Product.prototype, "createdAt", void 0);
-__decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
-    __metadata("design:type", Date)
-], Product.prototype, "updatedAt", void 0);
-exports.Product = Product = __decorate([
-    (0, typeorm_1.Entity)('products')
-], Product);
-//# sourceMappingURL=product.entity.js.map
+], PriceHistory.prototype, "changedAt", void 0);
+exports.PriceHistory = PriceHistory = __decorate([
+    (0, typeorm_1.Entity)('price_history')
+], PriceHistory);
+//# sourceMappingURL=price-history.entity.js.map

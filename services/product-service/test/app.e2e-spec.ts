@@ -91,7 +91,9 @@ describe('Product Service End-to-End (e2e)', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200)
         .expect((res) => {
-          expect(res.body.priceEur).toBeDefined();
+          // Service returns price{CURRENCY} in uppercase e.g. priceEUR
+          const key = 'priceEUR';
+          expect(res.body[key]).toBeDefined();
         });
     });
 

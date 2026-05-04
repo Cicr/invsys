@@ -11,6 +11,15 @@ export class Product {
   @Column('decimal', { precision: 10, scale: 2 })
   priceUsd: number;
 
+  @Column({ nullable: true })
+  category?: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column({ nullable: true, unique: true })
+  sku?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

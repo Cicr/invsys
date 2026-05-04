@@ -3,12 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { Product } from './product.entity';
+import { PriceHistory } from './price-history.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ExchangeModule } from '../exchange/exchange.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product]),
+    TypeOrmModule.forFeature([Product, PriceHistory]),
     ExchangeModule,
     ClientsModule.register([
       {

@@ -38,13 +38,13 @@
 **Goal:** Implement the high-throughput Inventory microservice in Golang adhering to CQRS/EDA patterns.
 
 ### Implementation Tracker
-- [ ] **INVSYS-7: Golang Service Foundation**
+- [x] **INVSYS-7: Golang Service Foundation**
   - *Initialize Go Modules and connection hooks to `inventory_db`.*
-- [ ] **INVSYS-8: Kafka Event Consumers**
+- [x] **INVSYS-8: Kafka Event Consumers**
   - *Build asynchronous consumers anticipating `product.created` streams.*
-- [ ] **INVSYS-9: Stock Mutation Handlers**
+- [x] **INVSYS-9: Stock Mutation Handlers**
   - *Handle CRUD CQRS operations for inventory ledgers.*
-- [ ] **INVSYS-10: Golang Testing & API Validation**
+- [x] **INVSYS-10: Golang Testing & API Validation**
   - *Generate `go test` coverage constraints and Swagger endpoint equivalents.*
 
 ---

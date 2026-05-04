@@ -36,9 +36,31 @@ services:
       - .env
     environment:
       - AUTH_DB_HOST=postgres
+      - KAFKA_BROKER_URL=kafka:9092
     depends_on:
       postgres:
         condition: service_healthy
+
+  # ----------------------------------------
+  # Inventory Service (Golang)
+  # ----------------------------------------
+  inventory-service:
+    build:
+      context: ../services/inventory-service
+      dockerfile: Dockerfile
+    container_name: invsys-inventory
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - INVENTORY_DB_HOST=postgres
+      - KAFKA_BROKER_URL=kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
 
   # ----------------------------------------
   # Redis (Cache)

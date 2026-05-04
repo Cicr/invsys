@@ -1,0 +1,19 @@
+<story-context id="invsys/workflows/sprint-5/story-context/invsys-14" v="1.0">
+  <metadata>
+    <epicId>INVSYS-500</epicId>
+    <storyId>INVSYS-14</storyId>
+    <title>Auth &amp; Product Defect Remediation</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>QA Analyst</asA>
+    <iWant>to stabilize the NestJS domains (Auth, Products)</iWant>
+    <soThat>the microservice landscape proves resilient under high loads</soThat>
+    <tasks>
+      - Run Jest coverage reports across Auth and Product services.
+      - Refactor and write missing specifications.
+      - Ensure caching logic natively skips on external API failure.
+    </tasks>
+  </story>
+</story-context>

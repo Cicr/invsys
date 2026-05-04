@@ -29,6 +29,11 @@ func StartConsumer() {
 	log.Println("Kafka consumer started listening on product.created")
 
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("Recovered from panic in Kafka consumer: %v", r)
+			}
+		}()
 		for {
 			m, err := reader.ReadMessage(context.Background())
 			if err != nil {

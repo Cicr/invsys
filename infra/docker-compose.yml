@@ -42,6 +42,30 @@ services:
         condition: service_healthy
 
   # ----------------------------------------
+  # Product Service (NestJS)
+  # ----------------------------------------
+  product-service:
+    build:
+      context: ../services/product-service
+      dockerfile: Dockerfile
+    container_name: invsys-product
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env
+    environment:
+      - PRODUCTS_DB_HOST=postgres
+      - REDIS_HOST=redis
+      - KAFKA_BROKER_URL=kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      kafka:
+        condition: service_started
+
+  # ----------------------------------------
   # Inventory Service (Golang)
   # ----------------------------------------
   inventory-service:
@@ -89,7 +113,7 @@ services:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093

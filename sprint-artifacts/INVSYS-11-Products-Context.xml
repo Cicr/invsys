@@ -1,0 +1,19 @@
+<story-context id="invsys/workflows/sprint-4/story-context/invsys-11" v="1.0">
+  <metadata>
+    <epicId>INVSYS-400</epicId>
+    <storyId>INVSYS-11</storyId>
+    <title>Products NestJS Foundation</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Backend Developer</asA>
+    <iWant>to establish the NestJS structure for the Products Domain</iWant>
+    <soThat>it can manage catalogs and interact natively with PostgreSQL</soThat>
+    <tasks>
+      - Scaffold NestJS project structure.
+      - Wire TypeORM bindings to `products_db`.
+      - **CRITICAL:** Create `Dockerfile` and append to `docker-compose.yml`. ALL SERVICES MUST BE CONTAINERIZED.
+    </tasks>
+  </story>
+</story-context>

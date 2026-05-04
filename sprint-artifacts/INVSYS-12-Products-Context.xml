@@ -1,0 +1,19 @@
+<story-context id="invsys/workflows/sprint-4/story-context/invsys-12" v="1.0">
+  <metadata>
+    <epicId>INVSYS-400</epicId>
+    <storyId>INVSYS-12</storyId>
+    <title>External Exchange Rate Client</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Backend Developer</asA>
+    <iWant>to attach a Redis-backed HTTP client inside NestJS</iWant>
+    <soThat>product catalogs can swiftly convert currency strings without thrashing external APIs</soThat>
+    <tasks>
+      - Integrate `@nestjs/cache-manager` and `cache-manager-redis-store`.
+      - Build external API polling logic with fallbacks.
+      - **CRITICAL:** Service MUST BE CONTAINERIZED referencing Docker's Redis.
+    </tasks>
+  </story>
+</story-context>

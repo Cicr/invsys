@@ -1,0 +1,18 @@
+<story-context id="invsys/workflows/sprint-5/story-context/invsys-15" v="1.0">
+  <metadata>
+    <epicId>INVSYS-500</epicId>
+    <storyId>INVSYS-15</storyId>
+    <title>Inventory Defect Remediation</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>QA Analyst</asA>
+    <iWant>to audit the Golang Inventory service concurrent boundaries</iWant>
+    <soThat>race conditions are structurally impossible during real-time scaling</soThat>
+    <tasks>
+      - Expand Go unit tests using `sqlmock` targeting negative and failure conditions natively.
+      - Ensure the Kafka worker catches panics or JSON unmarshal faults safely.
+    </tasks>
+  </story>
+</story-context>

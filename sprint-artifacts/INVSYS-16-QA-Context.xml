@@ -1,0 +1,18 @@
+<story-context id="invsys/workflows/sprint-5/story-context/invsys-16" v="1.0">
+  <metadata>
+    <epicId>INVSYS-500</epicId>
+    <storyId>INVSYS-16</storyId>
+    <title>Comprehensive Delivery Report</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Project Manager</asA>
+    <iWant>to consolidate the results of the QA remediation sprint</iWant>
+    <soThat>architectural stability is formally documented</soThat>
+    <tasks>
+      - Capture Jest and Go test output schemas.
+      - Compile into `QA-Delivery-Report.md`.
+    </tasks>
+  </story>
+</story-context>

@@ -1,0 +1,20 @@
+<story-context id="invsys/workflows/sprint-4/story-context/invsys-13" v="1.0">
+  <metadata>
+    <epicId>INVSYS-400</epicId>
+    <storyId>INVSYS-13</storyId>
+    <title>Kafka Event Producers</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Backend Developer</asA>
+    <iWant>to attach Kafka producer hooks inside the NestJS mutation streams</iWant>
+    <soThat>Inventory ledgers initialize dynamically upon catalog growth</soThat>
+    <tasks>
+      - Integrate NestJS Microservices Kafka Client.
+      - Establish `ClientKafka` DI tokens.
+      - Trigger `.emit('product.created', data)` inside the product creation service.
+      - **CRITICAL:** Service MUST BE CONTAINERIZED targeting `kafka:9092`.
+    </tasks>
+  </story>
+</story-context>

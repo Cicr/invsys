@@ -53,11 +53,11 @@
 **Goal:** Implement the Product microservice managing cataloging and third-party rate limiting.
 
 ### Implementation Tracker
-- [ ] **INVSYS-11: Products NestJS Foundation**
+- [x] **INVSYS-11: Products NestJS Foundation**
   - *Scaffold the NextJS App and connect to `products_db`.*
-- [ ] **INVSYS-12: External Exchange Rate Client**
+- [x] **INVSYS-12: External Exchange Rate Client**
   - *Implement API polling with robust Redis caching and TTL adherence.*
-- [ ] **INVSYS-13: Kafka Event Producers**
+- [x] **INVSYS-13: Kafka Event Producers**
   - *Emit strictly typed events (`product.created`) upon catalog mutations.*
 
 ---
@@ -66,9 +66,9 @@
 **Goal:** Enforce 100% Test Coverage conforming to all defined features spanning the PRD, PDD, and ADRs.
 
 ### Implementation Tracker
-- [ ] **INVSYS-14: Auth & Product Defect Remediation**
-- [ ] **INVSYS-15: Inventory Defect Remediation**
-- [ ] **INVSYS-16: Comprehensive Delivery Report**
+- [x] **INVSYS-14: Auth & Product Defect Remediation**
+- [x] **INVSYS-15: Inventory Defect Remediation**
+- [x] **INVSYS-16: Comprehensive Delivery Report**
 
 ---
 

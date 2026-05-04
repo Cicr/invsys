@@ -1,0 +1,19 @@
+<story-context id="invsys/workflows/sprint-3/story-context/invsys-7" v="1.0">
+  <metadata>
+    <epicId>INVSYS-300</epicId>
+    <storyId>INVSYS-7</storyId>
+    <title>Golang Service Foundation</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Backend Developer</asA>
+    <iWant>to establish the Golang structure for the Inventory Domain</iWant>
+    <soThat>it can interact with the DB and event bus natively</soThat>
+    <tasks>
+      - Scaffold Golang project structure.
+      - Wire GORM or standard lib Postgres bindings to `inventory_db`.
+      - **CRITICAL:** Create `Dockerfile` and append to `docker-compose.yml`. ALL SERVICES MUST BE CONTAINERIZED.
+    </tasks>
+  </story>
+</story-context>

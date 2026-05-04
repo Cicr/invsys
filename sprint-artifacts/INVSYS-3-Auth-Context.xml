@@ -1,0 +1,29 @@
+<story-context id="invsys/workflows/sprint-1/story-context/invsys-3" v="1.0">
+  <metadata>
+    <epicId>INVSYS-100</epicId>
+    <storyId>INVSYS-3</storyId>
+    <title>API Contracts &amp; Swagger</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2026-05-03</generatedAt>
+    <generator>InvSys Agent</generator>
+    <sourceStoryPath>sprint-artifacts/INVSYS-3-Auth-User-Story.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>to expose the Auth logic over Swagger-documented REST controllers</iWant>
+    <soThat>interaction with the auth system is strictly structured via class-validators and immediately testable through a GUI</soThat>
+    <tasks>
+      - Create `auth.controller.ts` with routing prefixes
+      - Define explicit DTO classes (`LoginDto`, `RegisterDto`)
+      - Bind DTOs to standard validation pipes globally
+      - Decorate controllers using `@ApiTags`, `@ApiOperation`, and `@ApiResponse`
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">Validation pipes throw HTTP 400 when missing payloads in POST endpoints.</criterion>
+    <criterion id="AC2">DTO fields render correctly in Swagger interface.</criterion>
+    <criterion id="AC3">The login controller successfully hooks into the AuthService to issue a JWT response.</criterion>
+  </acceptanceCriteria>
+</story-context>

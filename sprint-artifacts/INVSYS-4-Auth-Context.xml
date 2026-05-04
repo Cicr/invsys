@@ -1,0 +1,27 @@
+<story-context id="invsys/workflows/sprint-1/story-context/invsys-4" v="1.0">
+  <metadata>
+    <epicId>INVSYS-100</epicId>
+    <storyId>INVSYS-4</storyId>
+    <title>Test Coverage Shield</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2026-05-03</generatedAt>
+    <generator>InvSys Agent</generator>
+    <sourceStoryPath>sprint-artifacts/INVSYS-4-Auth-User-Story.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>to write strict Jest assertions covering all paths of our Auth application</iWant>
+    <soThat>future adjustments to the monolithic structures are protected against CI/CD test regressions natively</soThat>
+    <tasks>
+      - Scaffold `.spec.ts` files surrounding the Auth Service and Controller
+      - Create mock factories overriding `JwtService` and `DataSource`
+      - Rigorously assert correct HTTP 401 behaviors on malformed requests
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">Test suite completes without executing network overhead bindings.</criterion>
+    <criterion id="AC2">Code coverage strictly reports >= 95% threshold limitations globally for the Auth Service codebase.</criterion>
+  </acceptanceCriteria>
+</story-context>

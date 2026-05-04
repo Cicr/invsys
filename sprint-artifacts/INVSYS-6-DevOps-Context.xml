@@ -1,0 +1,27 @@
+<story-context id="invsys/workflows/sprint-2/story-context/invsys-6" v="1.0">
+  <metadata>
+    <epicId>INVSYS-200</epicId>
+    <storyId>INVSYS-6</storyId>
+    <title>End-to-End Environment Validation</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2026-05-03</generatedAt>
+    <generator>InvSys Agent</generator>
+    <sourceStoryPath>sprint-artifacts/INVSYS-6-DevOps-User-Story.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>QA Pipeline Supervisor</asA>
+    <iWant>to ensure the infrastructure is 100% stable upon startup</iWant>
+    <soThat>local development seamlessly transitions onto Auth, Product, and Inventory code integrations without container disruptions</soThat>
+    <tasks>
+      - Construct QA checks (or Taskfile dependencies) enforcing Postgres init.sql schema fires accurately.
+      - Validate Redis connection pings internally.
+      - Check Kafka cluster outputs reporting normal KRaft availability natively.
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">No unhandled container resets occur during `task up` deployments globally.</criterion>
+    <criterion id="AC2">Databases `auth_db`, `products_db`, and `inventory_db` successfully exist isolated across Postgres execution.</criterion>
+  </acceptanceCriteria>
+</story-context>

@@ -1,0 +1,19 @@
+<story-context id="invsys/workflows/sprint-3/story-context/invsys-8" v="1.0">
+  <metadata>
+    <epicId>INVSYS-300</epicId>
+    <storyId>INVSYS-8</storyId>
+    <title>Kafka Event Consumers</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Backend Developer</asA>
+    <iWant>to attach Kafka consumer polling inside the Go runtime</iWant>
+    <soThat>Inventory ledgers decouple successfully from Product creations</soThat>
+    <tasks>
+      - Integrate a Go Kafka client (e.g. `segmentio/kafka-go`).
+      - Bind listening loops on startup.
+      - **CRITICAL:** Service MUST BE CONTAINERIZED.
+    </tasks>
+  </story>
+</story-context>

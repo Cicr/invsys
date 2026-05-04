@@ -1,0 +1,28 @@
+<story-context id="invsys/workflows/sprint-2/story-context/invsys-5" v="1.0">
+  <metadata>
+    <epicId>INVSYS-200</epicId>
+    <storyId>INVSYS-5</storyId>
+    <title>Taskfile Orchestration</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2026-05-03</generatedAt>
+    <generator>InvSys Agent</generator>
+    <sourceStoryPath>sprint-artifacts/INVSYS-5-DevOps-User-Story.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>DevOps pipeline engineer</asA>
+    <iWant>to consolidate complex Docker bindings behind simple task verbs</iWant>
+    <soThat>developers don't have to memorize explicit environmental docker paths for booting up</soThat>
+    <tasks>
+      - Construct `Taskfile.yaml` within the project root
+      - Provide `up` command wrapping `docker compose ... up -d`
+      - Provide `down` command wrapping `docker compose ... down`
+      - Provide `logs` and `ps` quality-of-life additions.
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">Taskfile cleanly points context flags exclusively toward `infra/docker-compose.yml` and `infra/.env` variables.</criterion>
+    <criterion id="AC2">Executing `task --list` displays user-friendly descriptions.</criterion>
+  </acceptanceCriteria>
+</story-context>

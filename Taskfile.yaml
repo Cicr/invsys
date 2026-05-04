@@ -1,0 +1,44 @@
+version: '3'
+
+vars:
+  COMPOSE_FILE: infra/docker-compose.yml
+  ENV_FILE: infra/.env
+
+tasks:
+  up:
+    desc: Deploy the local infrastructure stack natively (Postgres, Redis, Kafka)
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} --env-file {{.ENV_FILE}} up -d
+
+  down:
+    desc: Tear down the infrastructure stack and purge associated volumes
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} --env-file {{.ENV_FILE}} down -v
+
+  start:auth:
+    desc: Start the Auth Microservice natively mapped to hot-reloaded development processes
+    dir: services/auth-service
+    cmds:
+      - npm run start:dev
+
+  start:
+    desc: Utility binding starting the Auth Service (temporary until other services are scaffolded)
+    cmds:
+      - task: start:auth
+
+  clean:
+    desc: Prune unused dangling docker images and disconnected internal volumes
+    cmds:
+      - docker system prune -f
+      - docker volume prune -f
+
+  verify:infra:
+    desc: Verify that all infrastructure components are up and running correctly
+    cmds:
+      - echo "Checking PostgreSQL..."
+      - docker exec -i invsys-postgres psql -U postgres -c '\l' | grep auth_db
+      - echo "Checking Redis..."
+      - docker exec -i invsys-redis redis-cli -a local_redis_secret ping
+      - echo "Checking Kafka..."
+      - docker logs invsys-kafka 2>&1 | grep "started"
+

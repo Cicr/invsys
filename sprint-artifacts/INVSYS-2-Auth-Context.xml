@@ -1,0 +1,38 @@
+<story-context id="invsys/workflows/sprint-1/story-context/invsys-2" v="1.0">
+  <metadata>
+    <epicId>INVSYS-100</epicId>
+    <storyId>INVSYS-2</storyId>
+    <title>JWT Core Security Model</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2026-05-03</generatedAt>
+    <generator>InvSys Agent</generator>
+    <sourceStoryPath>sprint-artifacts/INVSYS-2-Auth-User-Story.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>to implement JWT strategies and Passport guards</iWant>
+    <soThat>user identities can be securely authenticated via a standard Bearer token strategy</soThat>
+    <tasks>
+      - Install `@nestjs/jwt` and `@nestjs/passport` libraries
+      - Define `JwtStrategy` inside `auth.strategy.ts`
+      - Implement `AuthService` methods for `login()` (minting payload) and `validateUser()`
+      - Ensure token expires in `1h` (or as configured in env)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">Injects the localized `.env` secret securely utilizing NestJS modules.</criterion>
+    <criterion id="AC2">Properly mints a signed JWT based on User ID payload.</criterion>
+    <criterion id="AC3">Unauthenticated users strictly receive `401 Unauthorized`.</criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>sprint-artifacts/PDD.md</path>
+        <title>Product Design Document</title>
+      </doc>
+    </docs>
+  </artifacts>
+</story-context>

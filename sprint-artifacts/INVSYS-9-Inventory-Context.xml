@@ -1,0 +1,19 @@
+<story-context id="invsys/workflows/sprint-3/story-context/invsys-9" v="1.0">
+  <metadata>
+    <epicId>INVSYS-300</epicId>
+    <storyId>INVSYS-9</storyId>
+    <title>Stock Mutation Handlers</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>Backend Developer</asA>
+    <iWant>to expose CQRS mutation routes for stock ledgers</iWant>
+    <soThat>other services or gateways can safely decrement item quantities</soThat>
+    <tasks>
+      - Scaffold an HTTP router (Gin, Echo, or standard lib).
+      - Build command handlers executing SQL transactions.
+      - **CRITICAL:** Service MUST BE CONTAINERIZED.
+    </tasks>
+  </story>
+</story-context>

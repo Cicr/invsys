@@ -1,0 +1,61 @@
+<story-context id="invsys/workflows/sprint-1/story-context/template" v="1.0">
+  <metadata>
+    <epicId>INVSYS-100</epicId>
+    <storyId>INVSYS-1</storyId>
+    <title>Auth Microservice Foundation</title>
+    <status>ready-for-dev</status>
+    <generatedAt>2026-05-03</generatedAt>
+    <generator>InvSys Agent</generator>
+    <sourceStoryPath>sprint-artifacts/INVSYS-1-Auth-User-Story.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>backend developer</asA>
+    <iWant>to scaffold the Auth microservice and connect it to PostgreSQL</iWant>
+    <soThat>we have a secure foundation for minting JWTs and verifying User Identity across the microservice ecosystem</soThat>
+    <tasks>
+      - Scaffold NestJS base project via NestJS CLI inside `services/auth-service`
+      - Initialize PostgreSQL connection (TypeORM/Prisma)
+      - Provide `/health` status endpoint
+      - Implement Swagger UI plugin for OpenAPI generation
+      - Achieve 95% code coverage with Jest unit tests
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    <criterion id="AC1">App starts dynamically leveraging the `AUTH_APP_PORT` env variable.</criterion>
+    <criterion id="AC2">Connects to `auth_db` cleanly without throwing uncaught promises.</criterion>
+    <criterion id="AC3">Swagger is visible at `/api/docs` exposing valid OpenAPI endpoints.</criterion>
+    <criterion id="AC4">Jest Test coverage exceeds 95% logic paths.</criterion>
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>docs/adrs/ADR-001.md</path>
+        <title>Monorepo Architectural Decision Record</title>
+      </doc>
+      <doc>
+        <path>sprint-artifacts/PDD.md</path>
+        <title>Product Design Document</title>
+      </doc>
+    </docs>
+    <dependencies>
+      <nodejs>
+        <package name="@nestjs/cli" version="latest" />
+        <package name="@nestjs/swagger" version="latest" />
+      </nodejs>
+    </dependencies>
+  </artifacts>
+
+  <tests>
+    <standards>
+      NestJS Jest testing framework natively provided.
+    </standards>
+    <ideas>
+      <idea ac="AC1">e2e test: Start container, curl port, verify response.</idea>
+      <idea ac="AC2">unit test: Ensure postgres initialization module returns valid Provider.</idea>
+      <idea ac="AC4">Command constraint: Enforce execution of `npm run test:cov` inside the auth folder to ensure minimums meet 95%.</idea>
+    </ideas>
+  </tests>
+</story-context>

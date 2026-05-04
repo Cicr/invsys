@@ -1,0 +1,20 @@
+<story-context id="invsys/workflows/sprint-3/story-context/invsys-10" v="1.0">
+  <metadata>
+    <epicId>INVSYS-300</epicId>
+    <storyId>INVSYS-10</storyId>
+    <title>Golang Testing & API Validation</title>
+    <status>ready-for-dev</status>
+    <generator>InvSys Agent</generator>
+  </metadata>
+  <story>
+    <asA>QA Pipeline Supervisor</asA>
+    <iWant>to secure the Inventory codebase via mock coverage and Swagger contracts</iWant>
+    <soThat>future refactors don't inadvertently break existing downstream CQRS events</soThat>
+    <tasks>
+      - Utilize `swaggo/swag` or similar to generate API docs.
+      - Mock DB logic utilizing `sqlmock`.
+      - Expose `/api/docs` route from the container natively.
+      - **CRITICAL:** Service MUST BE CONTAINERIZED.
+    </tasks>
+  </story>
+</story-context>

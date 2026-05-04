@@ -106,7 +106,8 @@ export class ProductService {
     const product = await this.productRepo.findOne({ where: { id } });
     if (!product) return null;
 
-    await this.productRepo.remove(product);
+    // Soft-delete: sets deleted_at timestamp, record is retained in DB
+    await this.productRepo.softDelete(id);
 
     // Emit delete event to Kafka
     this.kafkaClient.emit('product.deleted', {
@@ -116,7 +117,7 @@ export class ProductService {
       error: (err) => this.logger.error('Kafka emit error on delete:', err),
     });
 
-    return true;
+    return { message: `Product ${id} archived successfully`, id };
   }
 
   async getPriceHistory(productId: string) {

@@ -25,6 +25,9 @@ export declare class ProductService {
         category: string;
         description: string;
     }>): Promise<Product | null>;
-    remove(id: string): Promise<true | null>;
+    remove(id: string): Promise<{
+        message: string;
+        id: string;
+    } | null>;
     getPriceHistory(productId: string): Promise<PriceHistory[]>;
 }

@@ -30,6 +30,8 @@ func main() {
 		v1.GET("/health", handlers.HealthCheck)
 		v1.POST("/inventory/add", handlers.AddStock)
 		v1.POST("/inventory/deduct", handlers.DeductStock)
+		v1.GET("/inventory/:productId", handlers.GetStock)
+		v1.DELETE("/inventory/:productId", handlers.SoftDeleteInventory)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

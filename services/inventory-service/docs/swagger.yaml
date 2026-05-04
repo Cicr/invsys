@@ -1,0 +1,174 @@
+basePath: /api/v1
+definitions:
+  models.InventoryItem:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      productId:
+        type: string
+      quantity:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  models.StockMutationRequest:
+    properties:
+      productId:
+        type: string
+      quantity:
+        type: integer
+    required:
+    - productId
+    - quantity
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: High-throughput inventory tracking and CQRS management via Golang.
+  title: Inventory Service API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: responds with status ok
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health Check
+      tags:
+      - health
+  /inventory/{productId}:
+    delete:
+      description: Archive (soft-delete) a product's inventory ledger entry. The record
+        is retained in DB with deleted_at set.
+      parameters:
+      - description: Product ID
+        in: path
+        name: productId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Soft-Delete Inventory
+      tags:
+      - inventory
+    get:
+      description: Get current stock level for a product
+      parameters:
+      - description: Product ID
+        in: path
+        name: productId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InventoryItem'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get Inventory
+      tags:
+      - inventory
+  /inventory/add:
+    post:
+      consumes:
+      - application/json
+      description: Add quantity to a product's inventory
+      parameters:
+      - description: Stock Add Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.StockMutationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InventoryItem'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add Stock
+      tags:
+      - inventory
+  /inventory/deduct:
+    post:
+      consumes:
+      - application/json
+      description: Deduct quantity from a product's inventory
+      parameters:
+      - description: Stock Deduct Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.StockMutationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InventoryItem'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deduct Stock
+      tags:
+      - inventory
+swagger: "2.0"

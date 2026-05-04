@@ -20,6 +20,7 @@ let Product = class Product {
     sku;
     createdAt;
     updatedAt;
+    deletedAt;
 };
 exports.Product = Product;
 __decorate([
@@ -54,6 +55,10 @@ __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)
 ], Product.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)(),
+    __metadata("design:type", Date)
+], Product.prototype, "deletedAt", void 0);
 exports.Product = Product = __decorate([
     (0, typeorm_1.Entity)('products')
 ], Product);

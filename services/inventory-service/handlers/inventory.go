@@ -9,6 +9,57 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetStock godoc
+// @Summary Get Inventory
+// @Description Get current stock level for a product
+// @Tags inventory
+// @Produce json
+// @Param productId path string true "Product ID"
+// @Success 200 {object} models.InventoryItem
+// @Failure 404 {object} map[string]string
+// @Router /inventory/{productId} [get]
+func GetStock(c *gin.Context) {
+	productID := c.Param("productId")
+	var item models.InventoryItem
+	if err := db.DB.Where("product_id = ?", productID).First(&item).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Inventory record not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch inventory"})
+		return
+	}
+	c.JSON(http.StatusOK, item)
+}
+
+// SoftDeleteInventory godoc
+// @Summary Soft-Delete Inventory
+// @Description Archive (soft-delete) a product's inventory ledger entry. The record is retained in DB with deleted_at set.
+// @Tags inventory
+// @Produce json
+// @Param productId path string true "Product ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /inventory/{productId} [delete]
+func SoftDeleteInventory(c *gin.Context) {
+	productID := c.Param("productId")
+	var item models.InventoryItem
+	if err := db.DB.Where("product_id = ?", productID).First(&item).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Inventory record not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find inventory record"})
+		return
+	}
+	// GORM soft-delete: sets deleted_at timestamp, record is retained in DB
+	if err := db.DB.Delete(&item).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to archive inventory record"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Inventory record archived", "productId": productID})
+}
+
 // HealthCheck godoc
 // @Summary Health Check
 // @Description responds with status ok

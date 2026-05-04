@@ -1,6 +1,7 @@
 import {
   Controller, Post, Get, Put, Patch, Delete,
-  Body, Param, Query, UseGuards, NotFoundException, HttpCode
+  Body, Param, Query, UseGuards, NotFoundException, HttpCode,
+  ParseUUIDPipe
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -23,13 +24,13 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id/history')
-  async getHistory(@Param('id') id: string) {
+  async getHistory(@Param('id', ParseUUIDPipe) id: string) {
     return this.productService.getPriceHistory(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async get(@Param('id') id: string, @Query('currency') currency?: string) {
+  async get(@Param('id', ParseUUIDPipe) id: string, @Query('currency') currency?: string) {
     const product = await this.productService.get(id, currency);
     if (!product) throw new NotFoundException(`Product ${id} not found`);
     return product;
@@ -37,7 +38,10 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Param('id') id: string, @Body() data: Partial<{ name: string; priceUsd: number; category: string; description: string }>) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: Partial<{ name: string; priceUsd: number; category: string; description: string }>,
+  ) {
     const product = await this.productService.update(id, data);
     if (!product) throw new NotFoundException(`Product ${id} not found`);
     return product;
@@ -45,7 +49,10 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async patch(@Param('id') id: string, @Body() data: Partial<{ name: string; priceUsd: number; category: string; description: string }>) {
+  async patch(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: Partial<{ name: string; priceUsd: number; category: string; description: string }>,
+  ) {
     const product = await this.productService.update(id, data);
     if (!product) throw new NotFoundException(`Product ${id} not found`);
     return product;
@@ -54,9 +61,9 @@ export class ProductController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(200)
-  async remove(@Param('id') id: string) {
-    const deleted = await this.productService.remove(id);
-    if (!deleted) throw new NotFoundException(`Product ${id} not found`);
-    return { message: `Product ${id} deleted successfully` };
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.productService.remove(id);
+    if (!result) throw new NotFoundException(`Product ${id} not found`);
+    return result;
   }
 }

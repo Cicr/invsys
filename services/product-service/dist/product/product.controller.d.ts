@@ -26,5 +26,6 @@ export declare class ProductController {
     }>): Promise<import("./product.entity").Product>;
     remove(id: string): Promise<{
         message: string;
+        id: string;
     }>;
 }

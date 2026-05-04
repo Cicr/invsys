@@ -98,14 +98,14 @@ let ProductService = ProductService_1 = class ProductService {
         const product = await this.productRepo.findOne({ where: { id } });
         if (!product)
             return null;
-        await this.productRepo.remove(product);
+        await this.productRepo.softDelete(id);
         this.kafkaClient.emit('product.deleted', {
             productId: id,
             action: 'product.deleted',
         }).subscribe({
             error: (err) => this.logger.error('Kafka emit error on delete:', err),
         });
-        return true;
+        return { message: `Product ${id} archived successfully`, id };
     }
     async getPriceHistory(productId) {
         return this.historyRepo.find({

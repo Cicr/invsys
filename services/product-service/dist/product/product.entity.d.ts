@@ -7,4 +7,5 @@ export declare class Product {
     sku?: string;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt?: Date;
 }

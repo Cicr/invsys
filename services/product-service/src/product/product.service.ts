@@ -9,7 +9,7 @@ import { ClientKafka } from '@nestjs/microservices';
 import { ExchangeService } from '../exchange/exchange.service';
 
 // Whitelisted currencies for strict validation (TD-3)
-const VALID_CURRENCIES = ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'SEK', 'NOK', 'DKK'];
+const VALID_CURRENCIES = ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'SEK', 'NOK', 'DKK', 'DOP'];
 
 @Injectable()
 export class ProductService {

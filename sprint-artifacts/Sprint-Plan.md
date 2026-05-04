@@ -76,9 +76,9 @@
 **Goal:** Implement telemetry and monitoring utilizing Grafana and Prometheus.
 
 ### Implementation Tracker
-- [ ] **INVSYS-17: Service Telemetry Endpoints**
+- [x] **INVSYS-17: Service Telemetry Endpoints**
   - *Add `/metrics` to NestJS and Golang.*
-- [ ] **INVSYS-18: Centralized Dashboards**
+- [x] **INVSYS-18: Centralized Dashboards**
   - *Add Prometheus/Grafana to Docker & build visual dashboards.*
 
 ---

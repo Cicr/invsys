@@ -12,6 +12,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	_ "github.com/invsys/inventory/docs" // swagger docs injected here
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // @title Inventory Service API
@@ -24,6 +25,7 @@ func main() {
 	kafka.StartConsumer()
 
 	r := gin.Default()
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	v1 := r.Group("/api/v1")
 	{

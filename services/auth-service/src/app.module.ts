@@ -4,8 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
 @Module({
   imports: [
+    PrometheusModule.register(),
     ConfigModule.forRoot({
       envFilePath: '../../infra/.env',
       isGlobal: true,

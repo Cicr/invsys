@@ -1,0 +1,43 @@
+@startuml invsys-erd
+skinparam backgroundcolor white
+!theme plain
+
+entity "USERS" as users {
+  *id : uuid <<PK>>
+  --
+  username : string
+  password_hash : string
+  role : string
+  status : string
+}
+
+entity "PRODUCTS" as products {
+  *id : uuid <<PK>>
+  --
+  name : string
+  price_usd : float
+  category : string
+  sku : string <<UK>>
+  created_at : datetime
+  deleted_at : datetime
+}
+
+entity "PRICE_HISTORY" as price_history {
+  *id : uuid <<PK>>
+  --
+  product_id : uuid <<FK>>
+  old_price : float
+  new_price : float
+  changed_at : datetime
+}
+
+entity "INVENTORY_ITEMS" as inventory_items {
+  *id : int <<PK>>
+  --
+  product_id : uuid <<UK>>
+  quantity : int
+  updated_at : datetime
+}
+
+products ||--o{ price_history : "tracks mutations"
+@enduml

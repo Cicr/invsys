@@ -1,0 +1,19 @@
+@startuml invsys-context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+skinparam backgroundcolor white
+
+title System Context for Invsys Platform (2026-05-05)
+
+Person(admin, "Admin", "Manages product catalog and tracks warehouse stock levels.")
+Person(user, "User", "Queries product catalog (role not yet implemented).")
+
+System_Boundary(invsys_boundary, "Invsys Platform") {
+  System(invsys, "Invsys Platform", "Handles user authentication, product lifecycle, and strict stock ledger management.")
+}
+
+System_Ext(exchangerates, "exchangerate-api.com", "External FX rate API for real-time currency conversion.")
+
+Rel(admin, invsys, "Uses and manages", "HTTPS")
+Rel(user, invsys, "Views products", "HTTPS")
+Rel(invsys, exchangerates, "Fetches daily rates", "HTTPS/JSON")
+@enduml

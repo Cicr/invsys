@@ -1,0 +1,32 @@
+@startuml invsys-sequence
+skinparam backgroundcolor white
+autonumber
+
+actor Admin
+participant "Product Service (NestJS)" as product
+database "Postgres (products_db)" as product_db
+queue "Kafka (product.created)" as kafka
+participant "Inventory Service (Golang)" as inventory
+database "Postgres (inventory_db)" as inventory_db
+
+note over Admin, inventory_db: Synchronous Creation Flow + Async Initialization
+
+Admin -> product : POST /products {name, priceUsd}
+activate product
+product -> product_db : INSERT INTO products
+activate product_db
+product_db --> product : Success (Returns UUID)
+deactivate product_db
+
+product -> kafka : Publish Event: { event: "product.created", id: UUID }
+product --> Admin : 201 Created (HTTP Response)
+deactivate product
+
+kafka -> inventory : Consume Event (Reader Group)
+activate inventory
+inventory -> inventory_db : CREATE initial ledger (product_id: UUID, qty: 0)
+activate inventory_db
+inventory_db --> inventory : Stock ledger initialized
+deactivate inventory_db
+deactivate inventory
+@enduml

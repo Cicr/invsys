@@ -1,0 +1,59 @@
+@startuml invsys-container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+skinparam backgroundcolor white
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+
+title Container Architecture -- Invsys Platform (2026-05-05)
+
+Person(admin, "Admin", "Gestiona productos y ajusta inventario")
+Person(user,  "User",  "Consulta catalogo (rol no sembrado)")
+System_Ext(fx_api, "exchangerate-api.com", "API externa de tasas FX")
+
+System_Boundary(invsys, "Invsys Platform [system]") {
+
+  Container(grafana,    "Grafana",    "Dashboard: 3000",      "Visualizacion")
+  Container(prometheus, "Prometheus", "TSDB: 9090",           "Scrape de /metrics")
+
+  Container(auth,      "Auth Service",      "NestJS/TypeScript: 3001", "Login, JWT issue/refresh, disable user, bcrypt")
+  Container(inventory, "Inventory Service", "Go/Gin/GORM: 8080",       "add/deduct/query stock * SIN auth aplicada *")
+  Container(product,   "Product Service",   "NestJS/TypeScript: 3002", "CRUD productos, conversion de moneda, historial de precios, JwtAuthGuard")
+
+  ContainerDb(postgres, "PostgreSQL 15", "RDBMS: 5432", "3 DBs: auth_db, products_db, inventory_db")
+  ContainerQueue(kafka, "Apache Kafka",  "KRaft: 9092", "Topics: product.created / updated / deleted")
+  ContainerDb(redis,    "Redis 7",       "Cache: 6379", "TTL 3600s para tasas FX")
+}
+
+' Layout hints
+Lay_R(admin, user)
+Lay_D(admin, auth)
+Lay_R(auth, inventory)
+Lay_R(inventory, product)
+Lay_D(auth, postgres)
+Lay_R(postgres, kafka)
+Lay_R(kafka, redis)
+Lay_L(grafana, prometheus)
+Lay_D(grafana, auth)
+
+' Relationships
+Rel(admin, auth,      "POST /auth/login",              "HTTPS/JSON")
+Rel(admin, inventory, "add/deduct stock sin token",    "HTTPS/JSON")
+Rel(admin, product,   "CRUD productos Bearer JWT",     "HTTPS/JSON")
+Rel(user,  product,   "GET /products Bearer JWT",      "HTTPS/JSON")
+
+Rel_U(prometheus, auth,      "scrape /metrics", "HTTP")
+Rel_U(prometheus, inventory, "scrape /metrics", "HTTP")
+Rel_U(prometheus, product,   "scrape /metrics", "HTTP")
+Rel(grafana, prometheus,     "PromQL queries",  "HTTP")
+
+Rel_D(auth,      postgres, "lee/escribe usuarios",             "TCP/SQL")
+Rel_D(inventory, postgres, "lee/escribe stock",                "TCP/SQL")
+Rel_D(product,   postgres, "lee/escribe productos+price_hist", "TCP/SQL")
+
+Rel_D(product,   kafka,    "publica product.{created,updated,deleted}", "TCP")
+Rel(kafka,    inventory,   "consume product.created",                   "TCP")
+Rel(product,  redis,       "cache de tasas FX",                         "TCP")
+Rel(product,  fx_api,      "GET /v6/latest/USD",                        "HTTPS")
+
+@enduml

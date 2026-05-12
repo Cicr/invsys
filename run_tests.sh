@@ -27,7 +27,7 @@ header() { echo -e "\n${BOLD}${CYAN}=== $1 ===${RESET}"; }
 header "AUTH-01"
 curl -s -X POST $AUTH_URL/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"password"}'
+  -d '{"username":"admin","password":"Admin123"}'
 
 header "AUTH-05"
 curl -s -X GET $PROD_URL/products
@@ -37,7 +37,7 @@ curl -s -X GET $INV_URL/api/v1/inventory/123
 
 TOKEN_ADMIN=$(curl -s -X POST $AUTH_URL/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"password"}' | jq -r .access_token)
+  -d '{"username":"admin","password":"Admin123"}' | jq -r .access_token)
 TOKEN_USER=$(curl -s -X POST $AUTH_URL/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"user","password":"password"}' | jq -r .access_token)

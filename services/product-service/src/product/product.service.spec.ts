@@ -49,7 +49,10 @@ describe('ProductService', () => {
     mockKafkaClient.emit.mockReturnValue({ subscribe: jest.fn() });
     const res = await service.create({ name: 'Test', priceUsd: 100 });
     expect(res.id).toBe('uuid-1');
-    expect(mockKafkaClient.emit).toHaveBeenCalledWith('product.created', { productId: 'uuid-1', action: 'product.created' });
+    expect(mockKafkaClient.emit).toHaveBeenCalledWith('product.created', expect.objectContaining({
+      payload: expect.any(String),
+      signature: expect.any(String),
+    }));
   });
 
   it('should return null if product not found', async () => {

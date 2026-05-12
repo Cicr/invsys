@@ -22,18 +22,45 @@ import (
 // @BasePath /api/v1
 func main() {
 	db.InitDB()
+	kafka.InitProducer()
 	kafka.StartConsumer()
 
 	r := gin.Default()
+
+	// Add CORS middleware
+	r.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, Idempotency-Key")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
+
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/health", handlers.HealthCheck)
-		v1.POST("/inventory/add", handlers.AddStock)
-		v1.POST("/inventory/deduct", handlers.DeductStock)
-		v1.GET("/inventory/:productId", handlers.GetStock)
-		v1.DELETE("/inventory/:productId", handlers.SoftDeleteInventory)
+
+		inventory := v1.Group("/inventory")
+		inventory.Use(handlers.AuthMiddleware())
+		{
+			inventory.GET("", handlers.ListInventory)
+			inventory.GET("/:productId", handlers.GetStock)
+			inventory.GET("/:productId/history", handlers.GetHistory)
+
+			admin := inventory.Group("")
+			admin.Use(handlers.RoleMiddleware("admin"))
+			{
+				admin.POST("/add", handlers.AddStock)
+				admin.POST("/deduct", handlers.DeductStock)
+				admin.DELETE("/:productId", handlers.SoftDeleteInventory)
+			}
+		}
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

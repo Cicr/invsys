@@ -43,7 +43,7 @@ func InitDB() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	err = DB.AutoMigrate(&models.InventoryItem{})
+	err = DB.AutoMigrate(&models.InventoryItem{}, &models.ProcessedRequest{}, &models.InventoryMovement{}, &models.DeadLetterQueueEvent{})
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

@@ -24,3 +24,31 @@ type KafkaProductEvent struct {
 	ProductID string `json:"productId"`
 	Action    string `json:"action"` // e.g., "product.created"
 }
+
+type ProcessedRequest struct {
+	IdempotencyKey string    `gorm:"primaryKey;type:varchar(255)" json:"idempotencyKey"`
+	CreatedAt      time.Time `json:"createdAt"`
+}
+
+type InventoryMovement struct {
+	ID        uint      `gorm:"primarykey" json:"id"`
+	ProductID string    `gorm:"index;not null" json:"productId"`
+	Delta     int       `gorm:"not null" json:"delta"`
+	Action    string    `gorm:"not null" json:"action"` // e.g., "add", "deduct"
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type KafkaInventoryEvent struct {
+	ProductID string `json:"productId"`
+	Action    string `json:"action"` // e.g., "inventory.adjusted"
+	Delta     int    `json:"delta"`
+	Total     int    `json:"total"`
+}
+
+type DeadLetterQueueEvent struct {
+	ID           uint      `gorm:"primarykey" json:"id"`
+	Topic        string    `json:"topic"`
+	Payload      string    `json:"payload"`
+	ErrorMessage string    `json:"errorMessage"`
+	CreatedAt    time.Time `json:"createdAt"`
+}

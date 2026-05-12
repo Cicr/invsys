@@ -7,9 +7,20 @@ import { Product } from './product.entity';
 import { PriceHistory } from './price-history.entity';
 import { ClientKafka } from '@nestjs/microservices';
 import { ExchangeService } from '../exchange/exchange.service';
+import * as crypto from 'crypto';
 
 // Whitelisted currencies for strict validation (TD-3)
 const VALID_CURRENCIES = ['EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'SEK', 'NOK', 'DKK', 'DOP'];
+
+function signKafkaMessage(data: any) {
+  const secret = process.env.KAFKA_HMAC_SECRET || 'super-secret-key';
+  const payload = JSON.stringify(data);
+  const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  return {
+    payload,
+    signature
+  };
+}
 
 @Injectable()
 export class ProductService {
@@ -30,21 +41,44 @@ export class ProductService {
     const saved = await this.productRepo.save(product);
 
     // Emit event asynchronously (TD-4: Kafka idempotency on consumer side)
-    this.kafkaClient.emit('product.created', {
+    this.kafkaClient.emit('product.created', signKafkaMessage({
       productId: saved.id,
       action: 'product.created',
-    }).subscribe({
+    })).subscribe({
       error: (err) => this.logger.error('Kafka emit error:', err),
     });
 
     return saved;
   }
 
-  async findAll(category?: string) {
+  async findAll(category?: string, currency?: string) {
+    let products: Product[];
     if (category) {
-      return this.productRepo.find({ where: { category } });
+      products = await this.productRepo.find({ where: { category } });
+    } else {
+      products = await this.productRepo.find();
     }
-    return this.productRepo.find();
+
+    if (currency && currency !== 'USD') {
+      const upperCurrency = currency.toUpperCase();
+      if (!VALID_CURRENCIES.includes(upperCurrency)) {
+        throw new BadRequestException(`Invalid currency: '${currency}'. Valid currencies: USD, ${VALID_CURRENCIES.join(', ')}`);
+      }
+
+      const rates = await this.exchangeService.getRates();
+      const rate = rates[upperCurrency];
+
+      if (!rate) {
+        throw new BadRequestException(`Currency rate not available for '${currency}'`);
+      }
+
+      return products.map(p => ({
+        ...p,
+        [`price${upperCurrency}`]: Number((p.priceUsd * rate).toFixed(2)),
+      }));
+    }
+
+    return products;
   }
 
   async get(id: string, currency?: string) {
@@ -92,10 +126,10 @@ export class ProductService {
     const updated = await this.productRepo.save(product);
 
     // Emit update event to Kafka
-    this.kafkaClient.emit('product.updated', {
+    this.kafkaClient.emit('product.updated', signKafkaMessage({
       productId: updated.id,
       action: 'product.updated',
-    }).subscribe({
+    })).subscribe({
       error: (err) => this.logger.error('Kafka emit error on update:', err),
     });
 
@@ -110,10 +144,10 @@ export class ProductService {
     await this.productRepo.softDelete(id);
 
     // Emit delete event to Kafka
-    this.kafkaClient.emit('product.deleted', {
+    this.kafkaClient.emit('product.deleted', signKafkaMessage({
       productId: id,
       action: 'product.deleted',
-    }).subscribe({
+    })).subscribe({
       error: (err) => this.logger.error('Kafka emit error on delete:', err),
     });
 

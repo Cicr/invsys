@@ -16,12 +16,14 @@ const exchange_module_1 = require("./exchange/exchange.module");
 const product_entity_1 = require("./product/product.entity");
 const price_history_entity_1 = require("./product/price-history.entity");
 const auth_module_1 = require("./auth/auth.module");
+const nestjs_prometheus_1 = require("@willsoto/nestjs-prometheus");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            nestjs_prometheus_1.PrometheusModule.register(),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',
                 host: process.env.PRODUCTS_DB_HOST || 'localhost',

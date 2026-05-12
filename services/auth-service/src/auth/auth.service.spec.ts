@@ -24,8 +24,8 @@ describe('AuthService', () => {
   });
 
   it('should validate valid user', async () => {
-    const result = await service.validateUser('admin', 'password');
-    expect(result).toEqual({ userId: 1, username: 'admin' });
+    const result = await service.validateUser('admin', 'Admin123');
+    expect(result).toEqual({ userId: 1, username: 'admin', role: 'admin' });
   });
 
   it('should reject invalid user', async () => {
@@ -34,8 +34,11 @@ describe('AuthService', () => {
   });
 
   it('should sign and return token on login', async () => {
-    const result = await service.login({ username: 'admin', userId: 1 });
-    expect(result).toEqual({ access_token: 'mock_token' });
-    expect(jwtService.sign).toHaveBeenCalledWith({ username: 'admin', sub: 1 });
+    const result = await service.login({ username: 'admin', userId: 1, role: 'admin' });
+    expect(result).toEqual({ 
+      access_token: 'mock_token',
+      user: { id: 1, username: 'admin', role: 'admin' }
+    });
+    expect(jwtService.sign).toHaveBeenCalledWith({ username: 'admin', sub: 1, role: 'admin' });
   });
 });

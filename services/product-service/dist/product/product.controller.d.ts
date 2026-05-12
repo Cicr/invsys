@@ -8,8 +8,8 @@ export declare class ProductController {
         category?: string;
         sku?: string;
         description?: string;
-    }): Promise<import("./product.entity").Product>;
-    findAll(category?: string): Promise<import("./product.entity").Product[]>;
+    }, req: any): Promise<import("./product.entity").Product>;
+    findAll(category?: string, currency?: string): Promise<import("./product.entity").Product[]>;
     getHistory(id: string): Promise<import("./price-history.entity").PriceHistory[]>;
     get(id: string, currency?: string): Promise<import("./product.entity").Product>;
     update(id: string, data: Partial<{
@@ -17,14 +17,14 @@ export declare class ProductController {
         priceUsd: number;
         category: string;
         description: string;
-    }>): Promise<import("./product.entity").Product>;
+    }>, req: any): Promise<import("./product.entity").Product>;
     patch(id: string, data: Partial<{
         name: string;
         priceUsd: number;
         category: string;
         description: string;
-    }>): Promise<import("./product.entity").Product>;
-    remove(id: string): Promise<{
+    }>, req: any): Promise<import("./product.entity").Product>;
+    remove(id: string, req: any): Promise<{
         message: string;
         id: string;
     }>;

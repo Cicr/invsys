@@ -21,11 +21,13 @@ let ProductController = class ProductController {
     constructor(productService) {
         this.productService = productService;
     }
-    async create(data) {
+    async create(data, req) {
+        if (req.user?.role !== 'admin')
+            throw new common_1.ForbiddenException('Only admins can create products');
         return this.productService.create(data);
     }
-    async findAll(category) {
-        return this.productService.findAll(category);
+    async findAll(category, currency) {
+        return this.productService.findAll(category, currency);
     }
     async getHistory(id) {
         return this.productService.getPriceHistory(id);
@@ -36,19 +38,25 @@ let ProductController = class ProductController {
             throw new common_1.NotFoundException(`Product ${id} not found`);
         return product;
     }
-    async update(id, data) {
+    async update(id, data, req) {
+        if (req.user?.role !== 'admin')
+            throw new common_1.ForbiddenException('Only admins can update products');
         const product = await this.productService.update(id, data);
         if (!product)
             throw new common_1.NotFoundException(`Product ${id} not found`);
         return product;
     }
-    async patch(id, data) {
+    async patch(id, data, req) {
+        if (req.user?.role !== 'admin')
+            throw new common_1.ForbiddenException('Only admins can patch products');
         const product = await this.productService.update(id, data);
         if (!product)
             throw new common_1.NotFoundException(`Product ${id} not found`);
         return product;
     }
-    async remove(id) {
+    async remove(id, req) {
+        if (req.user?.role !== 'admin')
+            throw new common_1.ForbiddenException('Only admins can delete products');
         const result = await this.productService.remove(id);
         if (!result)
             throw new common_1.NotFoundException(`Product ${id} not found`);
@@ -60,16 +68,18 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('category')),
+    __param(1, (0, common_1.Query)('currency')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "findAll", null);
 __decorate([
@@ -94,8 +104,9 @@ __decorate([
     (0, common_1.Put)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "update", null);
 __decorate([
@@ -103,8 +114,9 @@ __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "patch", null);
 __decorate([
@@ -112,8 +124,9 @@ __decorate([
     (0, common_1.Delete)(':id'),
     (0, common_1.HttpCode)(200),
     __param(0, (0, common_1.Param)('id', common_1.ParseUUIDPipe)),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "remove", null);
 exports.ProductController = ProductController = __decorate([

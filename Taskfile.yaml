@@ -42,3 +42,23 @@ tasks:
       - echo "Checking Kafka..."
       - docker logs invsys-kafka 2>&1 | grep "started"
 
+  rebuild:inventory:
+    desc: Rebuild the Golang inventory service container
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} --env-file {{.ENV_FILE}} up -d --build inventory-service
+
+  rebuild:auth:
+    desc: Rebuild the NestJS Auth service container
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} --env-file {{.ENV_FILE}} up -d --build auth-service
+
+  rebuild:product:
+    desc: Rebuild the NestJS Product service container
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} --env-file {{.ENV_FILE}} up -d --build product-service
+
+  rebuild:all:
+    desc: Rebuild all microservices in the stack
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} --env-file {{.ENV_FILE}} up -d --build
+

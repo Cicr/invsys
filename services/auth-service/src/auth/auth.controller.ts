@@ -1,6 +1,6 @@
 import {
-    Controller, Post, Body, UnauthorizedException,
-    ForbiddenException, UseGuards, Request, HttpCode
+    Controller, Post, Get, Body, UnauthorizedException,
+    ForbiddenException, UseGuards, Request, HttpCode, Patch, Param
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -32,13 +32,46 @@ export class AuthController {
         return this.authService.login(user);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get()
+    @ApiOperation({ summary: 'List all registered users (Admin only).' })
+    async listUsers(@Request() req: any) {
+        if (req.user?.role !== 'admin') {
+            throw new ForbiddenException('Only admins can view users');
+        }
+        return this.authService.listUsers();
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post('register')
     @ApiOperation({ summary: 'Register a new Bounded Context Identity.' })
     @ApiBody({ type: RegisterDto })
     @ApiResponse({ status: 201, description: 'User registered.' })
     @ApiResponse({ status: 400, description: 'Validation failed.' })
-    async register(@Body() registerDto: RegisterDto) {
-        return this.authService.register(registerDto.username, registerDto.email, registerDto.password);
+    @ApiResponse({ status: 403, description: 'Forbidden.' })
+    async register(@Body() registerDto: RegisterDto, @Request() req: any) {
+        if (req.user?.role !== 'admin') {
+            throw new ForbiddenException('Only admins can register new users');
+        }
+        return this.authService.register(registerDto.username, registerDto.password, registerDto.role);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('users/:username')
+    @ApiOperation({ summary: 'Update an existing user (Admin only).' })
+    async updateUser(
+        @Param('username') username: string,
+        @Body() body: { password?: string, role?: string },
+        @Request() req: any
+    ) {
+        if (req.user?.role !== 'admin') {
+            throw new ForbiddenException('Only admins can update users');
+        }
+        try {
+            return this.authService.updateUser(username, body);
+        } catch (e: any) {
+            throw new UnauthorizedException(e.message);
+        }
     }
 
     @Post('refresh')

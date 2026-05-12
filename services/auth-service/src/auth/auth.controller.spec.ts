@@ -16,6 +16,8 @@ describe('AuthController', () => {
           useValue: {
             validateUser: jest.fn(),
             login: jest.fn(),
+            isUserDisabled: jest.fn().mockReturnValue(false),
+            register: jest.fn().mockResolvedValue({ status: 'created', user: { username: 'testuser', role: 'user' } }),
           },
         },
       ],
@@ -27,8 +29,8 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('should successfully login valid users', async () => {
-      const mockUser = { userId: 1, username: 'admin' };
-      const mockToken = { access_token: 'mock_jwt' };
+      const mockUser = { userId: 1, username: 'admin', role: 'admin' };
+      const mockToken = { access_token: 'mock_jwt', user: { id: 1, username: 'admin', role: 'admin' } };
 
       jest.spyOn(authService, 'validateUser').mockResolvedValue(mockUser);
       jest.spyOn(authService, 'login').mockResolvedValue(mockToken);
@@ -49,10 +51,26 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should return mock created status', async () => {
-      const dto = { username: 'testuser', email: 'test@example.com', password: 'password' };
-      const result = await controller.register(dto);
+      const dto = { username: 'testuser', password: 'password', role: 'user' };
+      const req = { user: { role: 'admin' } };
+      const result = await controller.register(dto, req);
 
-      expect(result).toEqual({ status: 'created', user: { username: dto.username, email: dto.email } });
+      expect(result).toEqual({ status: 'created', user: { username: dto.username, role: dto.role } });
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should call authService.updateUser', async () => {
+      const username = 'testuser';
+      const body = { role: 'admin' };
+      const req = { user: { role: 'admin' } };
+      
+      const mockResult = { status: 'updated', user: { username, role: 'admin' } };
+      (authService as any).updateUser = jest.fn().mockResolvedValue(mockResult);
+
+      const result = await controller.updateUser(username, body, req);
+      expect(result).toEqual(mockResult);
+      expect(authService.updateUser).toHaveBeenCalledWith(username, body);
     });
   });
 });

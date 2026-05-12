@@ -2,50 +2,104 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 // In-memory store for disabled users (TD-2: user state management)
-// In production this should be backed by the users table in Postgres.
 const disabledUsers = new Set<string>();
 
-// In-memory user registry for registration (Sprint 1 scope, backed by DB in Sprint 2)
-const registeredUsers: { username: string; email: string; password: string }[] = [];
+// In-memory user registry (Sprint 1 scope, backed by DB in Sprint 2)
+// User objects now contain roles as requested in QA-Delivery-Report
+const registeredUsers: { username: string; password: string; role: string }[] = [];
 
 @Injectable()
 export class AuthService {
     constructor(private jwtService: JwtService) { }
 
     async validateUser(username: string, pass: string): Promise<any> {
-        // Check if user is disabled (TD-2)
-        if (disabledUsers.has(username)) {
-            return null; // Will result in 401; controller can differentiate
+        const lowerUsername = username.toLowerCase();
+        
+        // Check if user is disabled
+        if (disabledUsers.has(lowerUsername)) {
+            return null;
         }
 
         // Check hardcoded admin (Sprint 1 bootstrap)
-        if (username === 'admin' && pass === 'password') {
+        if (lowerUsername === 'admin' && pass === 'Admin123') {
             return { userId: 1, username: 'admin', role: 'admin' };
         }
 
         // Check registered users
-        const found = registeredUsers.find(u => u.username === username && u.password === pass);
+        const found = registeredUsers.find(u => u.username === lowerUsername && u.password === pass);
         if (found) {
-            return { userId: found.username, username: found.username, role: 'user' };
+            return { userId: found.username, username: found.username, role: found.role };
         }
 
         return null;
     }
 
     isUserDisabled(username: string): boolean {
-        return disabledUsers.has(username);
+        return disabledUsers.has(username.toLowerCase());
     }
 
     async login(user: any) {
         const payload = { username: user.username, sub: user.userId, role: user.role };
         return {
             access_token: this.jwtService.sign(payload),
+            user: {
+                id: user.userId,
+                username: user.username,
+                role: user.role
+            }
         };
     }
 
-    async register(username: string, email: string, password: string) {
-        registeredUsers.push({ username, email, password });
-        return { status: 'created', user: { username, email } };
+    async listUsers() {
+        return [
+            { id: 1, username: 'admin', role: 'admin', disabled: this.isUserDisabled('admin') },
+            ...registeredUsers.map(u => ({
+                id: u.username,
+                username: u.username,
+                role: u.role,
+                disabled: this.isUserDisabled(u.username)
+            }))
+        ];
+    }
+
+    async register(username: string, password: string, role: string = 'user') {
+        const lowerUsername = username.toLowerCase();
+        
+        // Check if already exists
+        if (lowerUsername === 'admin' || registeredUsers.some(u => u.username === lowerUsername)) {
+            throw new Error('User already exists');
+        }
+
+        registeredUsers.push({ username: lowerUsername, password, role });
+        return { status: 'created', user: { username: lowerUsername, role } };
+    }
+
+    async updateUser(username: string, data: { password?: string, role?: string }) {
+        const lowerUsername = username.toLowerCase();
+        
+        const user = registeredUsers.find(u => u.username === lowerUsername);
+        
+        // Handle the special bootstrap admin case separately if it's not in registeredUsers
+        if (!user && lowerUsername === 'admin') {
+            // Note: In Sprint 1, 'admin' is hardcoded. 
+            // If we want to allow editing its role/password, we'd need to move it to state.
+            // For now, let's treat 'admin' as a read-only super-admin, 
+            // but allow editing ANY registered user (including those with admin role).
+            throw new Error('Bootstrap super-admin is immutable in this version. Edit other admin accounts instead.');
+        }
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        if (data.password) {
+            user.password = data.password;
+        }
+        if (data.role) {
+            user.role = data.role;
+        }
+
+        return { status: 'updated', user: { username: user.username, role: user.role } };
     }
 
     async refresh(token: string) {
@@ -57,7 +111,13 @@ export class AuthService {
     }
 
     async disableUser(username: string) {
-        disabledUsers.add(username);
-        return { status: 'disabled', username };
+        const lowerUsername = username.toLowerCase();
+        if (disabledUsers.has(lowerUsername)) {
+            disabledUsers.delete(lowerUsername);
+            return { status: 'enabled', username: lowerUsername };
+        } else {
+            disabledUsers.add(lowerUsername);
+            return { status: 'disabled', username: lowerUsername };
+        }
     }
 }

@@ -17,7 +17,7 @@ export declare class ProductService {
         sku?: string;
         description?: string;
     }): Promise<Product>;
-    findAll(category?: string): Promise<Product[]>;
+    findAll(category?: string, currency?: string): Promise<Product[]>;
     get(id: string, currency?: string): Promise<Product | null>;
     update(id: string, data: Partial<{
         name: string;
